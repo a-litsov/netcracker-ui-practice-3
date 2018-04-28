@@ -7,25 +7,28 @@ public class Book {
     private int id;
     private String authorName, title;
     private int pagesCount;
+    private int year;
     private Date addDate;
 
     public Book() {
     }
 
-    public Book(int id, String authorName, String title, int pagesCount, Date addDate) {
+    public Book(int id, String authorName, String title, int pagesCount, int year, Date addDate) {
 
         this.id = id;
         this.authorName = authorName;
         this.title = title;
         this.pagesCount = pagesCount;
+        this.year = year;
         this.addDate = addDate;
     }
 
-    public Book(String authorName, String title, int pagesCount) {
+    public Book(String authorName, String title, int pagesCount, int year) {
 
         this.authorName = authorName;
         this.title = title;
         this.pagesCount = pagesCount;
+        this.year = year;
     }
 
     public int getId() {
@@ -60,6 +63,14 @@ public class Book {
         this.pagesCount = pagesCount;
     }
 
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
     public Date getAddDate() {
         return addDate;
     }
@@ -88,6 +99,7 @@ public class Book {
                 ", authorName='" + authorName + '\'' +
                 ", title='" + title + '\'' +
                 ", pagesCount=" + pagesCount +
+                ", year=" + year +
                 ", addDate=" + addDate +
                 '}';
     }

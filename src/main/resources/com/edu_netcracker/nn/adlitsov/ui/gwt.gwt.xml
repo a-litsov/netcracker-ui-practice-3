@@ -10,6 +10,8 @@
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
+  <inherits name="org.fusesource.restygwt.RestyGWT"/>
+
   <!-- Other module inherits                                      -->
 
   <!-- Specify the app entry point class.                         -->
