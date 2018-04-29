@@ -7,6 +7,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
 import org.fusesource.restygwt.client.Defaults;
@@ -166,6 +168,7 @@ public class gwt implements EntryPoint {
                 return Book.getTitle();
             }
         };
+        titleColumn.setDataStoreName("title");
 
         // Make the title column sortable.
         titleColumn.setSortable(true);
@@ -177,6 +180,8 @@ public class gwt implements EntryPoint {
                 return Book.getAuthorName();
             }
         };
+        authorColumn.setDataStoreName("author");
+        authorColumn.setSortable(true);
 
         // Create pages column.
         TextColumn<Book> pagesColumn = new TextColumn<Book>() {
@@ -185,6 +190,8 @@ public class gwt implements EntryPoint {
                 return Integer.toString(Book.getPagesCount());
             }
         };
+        pagesColumn.setDataStoreName("pages");
+        pagesColumn.setSortable(true);
 
         // Create address column.
         TextColumn<Book> yearColumn = new TextColumn<Book>() {
@@ -193,7 +200,8 @@ public class gwt implements EntryPoint {
                 return Integer.toString(Book.getYear());
             }
         };
-
+        yearColumn.setDataStoreName("year");
+        yearColumn.setSortable(true);
 
         // Add the columns.
         table.addColumn(titleColumn, "Title");
@@ -201,9 +209,35 @@ public class gwt implements EntryPoint {
         table.addColumn(pagesColumn, "Pages count");
         table.addColumn(yearColumn, "Year");
 
-        // Create a data provider.
 //        ListDataProvider<Book> dataProvider = new ListDataProvider<Book>();
         table.setRowCount(ROWS_COUNT);
+
+        table.addColumnSortHandler((event) -> {
+            ColumnSortList sortList = table.getColumnSortList();
+            if (sortList != null && sortList.size() > 0) {
+                Column<Book, ?> sortColumn = (Column<Book, ?>) sortList.get(0).getColumn();
+                String name = sortColumn.getDataStoreName();
+                boolean isAsc = event.isSortAscending();
+
+                bookService.sortBooks(name, isAsc, new MethodCallback<List<Book>>() {
+                    @Override
+                    public void onFailure(Method method, Throwable throwable) {
+                        Label failureLabel = new Label("Bad sorting request! :(");
+                        RootPanel.get("gwtContainer").add(failureLabel);
+                    }
+
+                    @Override
+                    public void onSuccess(Method method, List<Book> books) {
+                        Label successLabel = new Label("Sorted books on server!");
+                        RootPanel.get("gwtContainer").add(successLabel);
+
+                        table.setRowData(books);
+                    }
+                });
+            }
+        });
+
+
 
         // Add it to the root panel.
         RootPanel.get("gwtContainer").add(table);

@@ -30,4 +30,39 @@ public class BookStorage {
         return new ArrayList<>(books);
     }
 
+    public List<Book> sortByColumn(String columnName, boolean isAsc) {
+        Comparator<Book> comp = null;
+        switch (columnName) {
+            case "id":
+                comp = Comparator.comparing(Book::getId);
+                break;
+            case "title":
+                comp = Comparator.comparing(Book::getTitle);
+                break;
+            case "author":
+                comp = Comparator.comparing(Book::getAuthorName);
+                break;
+            case "pages":
+                comp = Comparator.comparing(Book::getPagesCount);
+                break;
+            case "year":
+                comp = Comparator.comparing(Book::getYear);
+                break;
+            case "addDate":
+                comp = Comparator.comparing(Book::getAddDate);
+                break;
+            default:
+                throw new IllegalArgumentException("Column-to-field mapping is not recognized! (Column " +
+                                                           columnName + " not found)");
+        }
+        if (!isAsc) {
+            comp = comp.reversed();
+        }
+
+        List<Book> sortBooks = new ArrayList<>(books);
+        sortBooks.sort(comp);
+
+        return sortBooks;
+    }
+
 }

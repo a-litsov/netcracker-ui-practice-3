@@ -25,4 +25,11 @@ public class BookService {
     public List<Book> getBooks() {
         return bookStorage.getBooks();
     }
+
+    @GET
+    @Path("sort={columnName}&isAsc={asc}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Book> sortBooks(@PathParam("columnName") String columnName, @PathParam("asc") boolean asc) {
+        return bookStorage.sortByColumn(columnName, asc);
+    }
 }

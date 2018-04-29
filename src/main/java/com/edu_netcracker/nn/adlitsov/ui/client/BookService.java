@@ -21,4 +21,10 @@ public interface BookService extends RestService {
     @Path("api/book")
     @Produces(MediaType.APPLICATION_JSON)
     void getBooks(MethodCallback<List<Book>> callback);
+
+    @GET
+    @Path("api/book/sort={columnName}&isAsc={asc}")
+    @Produces(MediaType.APPLICATION_JSON)
+    void sortBooks(@PathParam("columnName") String columnName, @PathParam("asc") boolean asc,
+                   MethodCallback<List<Book>> callback);
 }
