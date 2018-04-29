@@ -5,7 +5,8 @@ import java.util.Objects;
 
 public class Book {
     private int id;
-    private String authorName, title;
+    private String title;
+    private String authorName;
     private int pagesCount;
     private int year;
     private Date addDate;
@@ -13,20 +14,20 @@ public class Book {
     public Book() {
     }
 
-    public Book(int id, String authorName, String title, int pagesCount, int year, Date addDate) {
+    public Book(int id, String title, String authorName, int pagesCount, int year, Date addDate) {
 
         this.id = id;
-        this.authorName = authorName;
         this.title = title;
+        this.authorName = authorName;
         this.pagesCount = pagesCount;
         this.year = year;
         this.addDate = addDate;
     }
 
-    public Book(String authorName, String title, int pagesCount, int year) {
+    public Book(String title, String authorName, int pagesCount, int year) {
 
-        this.authorName = authorName;
         this.title = title;
+        this.authorName = authorName;
         this.pagesCount = pagesCount;
         this.year = year;
     }
@@ -39,20 +40,20 @@ public class Book {
         this.id = id;
     }
 
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
-
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 
     public int getPagesCount() {
@@ -96,8 +97,8 @@ public class Book {
     public String toString() {
         return "Book{" +
                 "id=" + id +
-                ", authorName='" + authorName + '\'' +
                 ", title='" + title + '\'' +
+                ", authorName='" + authorName + '\'' +
                 ", pagesCount=" + pagesCount +
                 ", year=" + year +
                 ", addDate=" + addDate +
