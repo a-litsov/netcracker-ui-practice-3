@@ -1,8 +1,6 @@
 package com.edu_netcracker.nn.adlitsov.ui.server;
 
-import com.edu_netcracker.nn.adlitsov.ui.server.BookStorage;
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
-
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,9 +16,13 @@ public class BookService {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public List<Book> addBook(Book book) throws IllegalArgumentException {
+    public void addBook(Book book) throws IllegalArgumentException {
         bookStorage.addBook(book);
+    }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Book> getBooks() {
         return bookStorage.getBooks();
     }
 }

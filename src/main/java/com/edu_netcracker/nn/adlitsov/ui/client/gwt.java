@@ -9,7 +9,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.view.client.ListDataProvider;
 import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -41,7 +40,9 @@ public class gwt implements EntryPoint {
 
     private final Messages messages = GWT.create(Messages.class);
 
-    private final ListDataProvider<Book> dataProvider = new ListDataProvider<>();
+    private static final int ROWS_COUNT = 10;
+
+    private CellTable<Book> table;
 
     /**
      * This is the entry point method.
@@ -51,6 +52,13 @@ public class gwt implements EntryPoint {
         root = root.replace("gwt/", "");
         Defaults.setServiceRoot(root);
 
+
+        createAddPanel();
+        createTable();
+        loadAllBooksToTable();
+    }
+
+    private void createAddPanel() {
         final Label titleLabel = new Label("Title:");
         final TextBox titleField = new TextBox();
 
@@ -70,10 +78,10 @@ public class gwt implements EntryPoint {
         addBookPanel.add(titleField);
         addBookPanel.add(authorNameLabel);
         addBookPanel.add(authorNameField);
-        addBookPanel.add(yearLabel);
-        addBookPanel.add(yearField);
         addBookPanel.add(pagesLabel);
         addBookPanel.add(pagesField);
+        addBookPanel.add(yearLabel);
+        addBookPanel.add(yearField);
         addBookPanel.add(sendButton);
 
         RootPanel.get("gwtContainer").add(addBookPanel);
@@ -101,11 +109,11 @@ public class gwt implements EntryPoint {
                 }
                 System.out.println(year);
 
-                Book book = new Book(authorName, bookTitle, pages, year);
+                Book book = new Book(bookTitle, authorName, pages, year);
 
                 // Then, we send the input to the server.
 //        sendButton.setEnabled(false);
-                bookService.addBook(book, new MethodCallback<List<Book>>() {
+                bookService.addBook(book, new MethodCallback<Void>() {
                     @Override
                     public void onFailure(Method method, Throwable throwable) {
                         Label failureLabel = new Label("It's bad! :(");
@@ -113,12 +121,11 @@ public class gwt implements EntryPoint {
                     }
 
                     @Override
-                    public void onSuccess(Method method, List<Book> books) {
-                        Label successLabel = new Label("It's ok!");
+                    public void onSuccess(Method method, Void v) {
+                        Label successLabel = new Label("Added book!");
                         RootPanel.get("gwtContainer").add(successLabel);
-                        List<Book> tableBooks = dataProvider.getList();
-                        tableBooks.clear();
-                        tableBooks.addAll(books);
+
+                        loadAllBooksToTable();
                     }
                 });
             }
@@ -127,13 +134,30 @@ public class gwt implements EntryPoint {
         // Add a handler to send the name to the server
         MyHandler handler = new MyHandler();
         sendButton.addClickHandler(handler);
+    }
 
-        createTable();
+    private void loadAllBooksToTable() {
+        bookService.getBooks(new MethodCallback<List<Book>>() {
+            @Override
+            public void onFailure(Method method, Throwable throwable) {
+                Label failureLabel = new Label("It's bad! :(");
+                RootPanel.get("gwtContainer").add(failureLabel);
+            }
+
+            @Override
+            public void onSuccess(Method method, List<Book> books) {
+                Label successLabel = new Label("Got books!");
+                RootPanel.get("gwtContainer").add(successLabel);
+
+                table.setRowData(books);
+            }
+        });
+
     }
 
     private void createTable() {
         // Create a CellTable.
-        CellTable<Book> table = new CellTable<>();
+        table = new CellTable<>();
 
         // Create title column.
         TextColumn<Book> titleColumn = new TextColumn<Book>() {
@@ -179,39 +203,7 @@ public class gwt implements EntryPoint {
 
         // Create a data provider.
 //        ListDataProvider<Book> dataProvider = new ListDataProvider<Book>();
-
-        // Connect the table to the data provider.
-        dataProvider.addDataDisplay(table);
-
-        // Add the data to the data provider, which automatically pushes it to the
-        // widget.
-//        List<Book> list = dataProvider.getList();
-//        for (Book Book : ) {
-//            list.add(Book);
-//        }
-
-        // Add a ColumnSortEvent.ListHandler to connect sorting to the
-        // java.util.List.
-//        ColumnSortEvent.ListHandler<Book> columnSortHandler = new ColumnSortEvent.ListHandler<Book>(
-//                dataProvider.getList());
-//        columnSortHandler.setComparator(titleColumn,
-//                                        new Comparator<Book>() {
-//                                            public int compare(Book o1, Book o2) {
-//                                                if (o1 == o2) {
-//                                                    return 0;
-//                                                }
-//
-//                                                // Compare the name columns.
-//                                                if (o1 != null) {
-//                                                    return (o2 != null) ? o1.getTitle().compareTo(o2.getTitle()) : 1;
-//                                                }
-//                                                return -1;
-//                                            }
-//                                        });
-//        table.addColumnSortHandler(columnSortHandler);
-
-        // We know that the data is sorted alphabetically by default.
-//        table.getColumnSortList().push(titleColumn);
+        table.setRowCount(ROWS_COUNT);
 
         // Add it to the root panel.
         RootPanel.get("gwtContainer").add(table);
