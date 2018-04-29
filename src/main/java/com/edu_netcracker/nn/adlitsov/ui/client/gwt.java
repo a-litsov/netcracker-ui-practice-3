@@ -2,20 +2,19 @@ package com.edu_netcracker.nn.adlitsov.ui.client;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
 import com.edu_netcracker.nn.adlitsov.ui.shared.FieldVerifier;
-import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.view.client.ListDataProvider;
 import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
+
+import java.util.List;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -32,7 +31,7 @@ public class gwt implements EntryPoint {
      * returns an error.
      */
     private static final String SERVER_ERROR = "An error occurred while "
-            + "attempting to contact the server. Please check your network "
+            + "attempting to Book the server. Please check your network "
             + "connection and try again.";
 
     /**
@@ -42,12 +41,14 @@ public class gwt implements EntryPoint {
 
     private final Messages messages = GWT.create(Messages.class);
 
+    private final ListDataProvider<Book> dataProvider = new ListDataProvider<>();
+
     /**
      * This is the entry point method.
      */
     public void onModuleLoad() {
-        String root= Defaults.getServiceRoot();
-        root=root.replace("gwt/","");
+        String root = Defaults.getServiceRoot();
+        root = root.replace("gwt/", "");
         Defaults.setServiceRoot(root);
 
         final Label titleLabel = new Label("Title:");
@@ -104,7 +105,7 @@ public class gwt implements EntryPoint {
 
                 // Then, we send the input to the server.
 //        sendButton.setEnabled(false);
-                bookService.addBook(book, new MethodCallback<Book>() {
+                bookService.addBook(book, new MethodCallback<List<Book>>() {
                     @Override
                     public void onFailure(Method method, Throwable throwable) {
                         Label failureLabel = new Label("It's bad! :(");
@@ -112,12 +113,12 @@ public class gwt implements EntryPoint {
                     }
 
                     @Override
-                    public void onSuccess(Method method, Book books) {
+                    public void onSuccess(Method method, List<Book> books) {
                         Label successLabel = new Label("It's ok!");
                         RootPanel.get("gwtContainer").add(successLabel);
-//                        for (Book book : books) {
-                            RootPanel.get("gwtContainer").add(new Label(book.toString()));
-//                        }
+                        List<Book> tableBooks = dataProvider.getList();
+                        tableBooks.clear();
+                        tableBooks.addAll(books);
                     }
                 });
             }
@@ -126,5 +127,93 @@ public class gwt implements EntryPoint {
         // Add a handler to send the name to the server
         MyHandler handler = new MyHandler();
         sendButton.addClickHandler(handler);
+
+        createTable();
+    }
+
+    private void createTable() {
+        // Create a CellTable.
+        CellTable<Book> table = new CellTable<>();
+
+        // Create title column.
+        TextColumn<Book> titleColumn = new TextColumn<Book>() {
+            @Override
+            public String getValue(Book Book) {
+                return Book.getTitle();
+            }
+        };
+
+        // Make the title column sortable.
+        titleColumn.setSortable(true);
+
+        // Create author column.
+        TextColumn<Book> authorColumn = new TextColumn<Book>() {
+            @Override
+            public String getValue(Book Book) {
+                return Book.getAuthorName();
+            }
+        };
+
+        // Create pages column.
+        TextColumn<Book> pagesColumn = new TextColumn<Book>() {
+            @Override
+            public String getValue(Book Book) {
+                return Integer.toString(Book.getPagesCount());
+            }
+        };
+
+        // Create address column.
+        TextColumn<Book> yearColumn = new TextColumn<Book>() {
+            @Override
+            public String getValue(Book Book) {
+                return Integer.toString(Book.getYear());
+            }
+        };
+
+
+        // Add the columns.
+        table.addColumn(titleColumn, "Title");
+        table.addColumn(authorColumn, "Author");
+        table.addColumn(pagesColumn, "Pages count");
+        table.addColumn(yearColumn, "Year");
+
+        // Create a data provider.
+//        ListDataProvider<Book> dataProvider = new ListDataProvider<Book>();
+
+        // Connect the table to the data provider.
+        dataProvider.addDataDisplay(table);
+
+        // Add the data to the data provider, which automatically pushes it to the
+        // widget.
+//        List<Book> list = dataProvider.getList();
+//        for (Book Book : ) {
+//            list.add(Book);
+//        }
+
+        // Add a ColumnSortEvent.ListHandler to connect sorting to the
+        // java.util.List.
+//        ColumnSortEvent.ListHandler<Book> columnSortHandler = new ColumnSortEvent.ListHandler<Book>(
+//                dataProvider.getList());
+//        columnSortHandler.setComparator(titleColumn,
+//                                        new Comparator<Book>() {
+//                                            public int compare(Book o1, Book o2) {
+//                                                if (o1 == o2) {
+//                                                    return 0;
+//                                                }
+//
+//                                                // Compare the name columns.
+//                                                if (o1 != null) {
+//                                                    return (o2 != null) ? o1.getTitle().compareTo(o2.getTitle()) : 1;
+//                                                }
+//                                                return -1;
+//                                            }
+//                                        });
+//        table.addColumnSortHandler(columnSortHandler);
+
+        // We know that the data is sorted alphabetically by default.
+//        table.getColumnSortList().push(titleColumn);
+
+        // Add it to the root panel.
+        RootPanel.get("gwtContainer").add(table);
     }
 }
