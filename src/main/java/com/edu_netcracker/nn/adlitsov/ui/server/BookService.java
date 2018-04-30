@@ -32,4 +32,11 @@ public class BookService {
     public List<Book> sortBooks(@PathParam("columnName") String columnName, @PathParam("asc") boolean asc) {
         return bookStorage.sortByColumn(columnName, asc);
     }
+
+    @GET
+    @Path("search={query}&limit={limit}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Book> sortBooks(@PathParam("query") String query, @PathParam("limit") int limit) {
+        return bookStorage.search(query, limit);
+    }
 }

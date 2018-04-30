@@ -43,6 +43,7 @@ public class gwt implements EntryPoint {
     private final Messages messages = GWT.create(Messages.class);
 
     private static final int ROWS_COUNT = 10;
+    private static final int SUGGEST_LIMIT = 10;
 
     private CellTable<Book> table;
 
@@ -58,6 +59,8 @@ public class gwt implements EntryPoint {
         createAddPanel();
         createTable();
         loadAllBooksToTable();
+        createSuggestBox();
+
     }
 
     private void createAddPanel() {
@@ -237,9 +240,13 @@ public class gwt implements EntryPoint {
             }
         });
 
-
-
         // Add it to the root panel.
         RootPanel.get("gwtContainer").add(table);
+    }
+
+    private void createSuggestBox() {
+        MultiWordSuggestOracle mwsOracle = new MultiWordsSuggestOracleREST(bookService, SUGGEST_LIMIT);
+        SuggestBox suggestBox = new SuggestBox(mwsOracle);
+        RootPanel.get("gwtContainer").add(suggestBox);
     }
 }

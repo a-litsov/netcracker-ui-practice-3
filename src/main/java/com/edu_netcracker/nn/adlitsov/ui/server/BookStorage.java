@@ -2,10 +2,13 @@ package com.edu_netcracker.nn.adlitsov.ui.server;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 public class BookStorage {
-    private Set<Book> books = new TreeSet<>(Comparator.comparing(Book::getId));
+    private List<Book> books = new ArrayList<>();
     private int lastId = 0;
 
     {
@@ -65,4 +68,16 @@ public class BookStorage {
         return sortBooks;
     }
 
+    public List<Book> search(String query, int limit) {
+        List<Book> result = new ArrayList<>();
+        int k = 0;
+        for (int i = 0; i < books.size() && k < limit; i++) {
+            Book curBook = books.get(i);
+            if (curBook.getTitle().toLowerCase().startsWith(query.toLowerCase())) {
+                result.add(curBook);
+                k++;
+            }
+        }
+        return result;
+    }
 }
