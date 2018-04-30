@@ -15,7 +15,7 @@
   <!-- Other module inherits                                      -->
 
   <!-- Specify the app entry point class.                         -->
-  <entry-point class='com.edu_netcracker.nn.adlitsov.ui.client.gwt' />
+  <entry-point class='com.edu_netcracker.nn.adlitsov.ui.client.Main'/>
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client' />

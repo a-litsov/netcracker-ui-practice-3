@@ -10,6 +10,10 @@ public class BookSuggestion implements SuggestOracle.Suggestion {
         this.book = book;
     }
 
+    public Book getBook() {
+        return book;
+    }
+
     @Override
     public String getDisplayString() {
         return book.toString();

@@ -32,4 +32,9 @@ public interface BookService extends RestService {
     @Path("api/book/search={query}&limit={limit}")
     @Produces(MediaType.APPLICATION_JSON)
     void search(@PathParam("query") String query, @PathParam("limit") int limit, MethodCallback<List<Book>> callback);
+
+    @DELETE
+    @Path("api/book/")
+    void deleteBook(Integer id, MethodCallback<Void> callback);
+
 }

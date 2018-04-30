@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class gwt implements EntryPoint {
+public class Main implements EntryPoint {
 
     static {
         // RestyGWT will use UNIX time and send it as JSONNumber
@@ -46,6 +46,7 @@ public class gwt implements EntryPoint {
     private static final int SUGGEST_LIMIT = 10;
 
     private CellTable<Book> table;
+    private Book lastSelectedBook;
 
     /**
      * This is the entry point method.
@@ -59,8 +60,7 @@ public class gwt implements EntryPoint {
         createAddPanel();
         createTable();
         loadAllBooksToTable();
-        createSuggestBox();
-
+        createRemovePanel();
     }
 
     private void createAddPanel() {
@@ -141,7 +141,7 @@ public class gwt implements EntryPoint {
         sendButton.addClickHandler(handler);
     }
 
-    private void loadAllBooksToTable() {
+    public void loadAllBooksToTable() {
         bookService.getBooks(new MethodCallback<List<Book>>() {
             @Override
             public void onFailure(Method method, Throwable throwable) {
@@ -244,9 +244,30 @@ public class gwt implements EntryPoint {
         RootPanel.get("gwtContainer").add(table);
     }
 
-    private void createSuggestBox() {
+    private SuggestBox createSuggestBox(Button deleteButton) {
         MultiWordSuggestOracle mwsOracle = new MultiWordsSuggestOracleREST(bookService, SUGGEST_LIMIT);
         SuggestBox suggestBox = new SuggestBox(mwsOracle);
-        RootPanel.get("gwtContainer").add(suggestBox);
+        suggestBox.addSelectionHandler((selectionEvent) -> {
+            BookSuggestion bookSuggestion = (BookSuggestion) selectionEvent.getSelectedItem();
+            lastSelectedBook = bookSuggestion.getBook();
+            deleteButton.setEnabled(true);
+        });
+        return suggestBox;
+    }
+
+    private void createRemovePanel() {
+        Button deleteButton = new Button("Delete");
+        deleteButton.addClickHandler(new DeleteButtonClickHandler(this, bookService, deleteButton));
+        SuggestBox suggestBox = createSuggestBox(deleteButton);
+
+        HorizontalPanel hPanel = new HorizontalPanel();
+        hPanel.add(suggestBox);
+        hPanel.add(deleteButton);
+
+        RootPanel.get("gwtContainer").add(hPanel);
+    }
+
+    public Book getLastSelectedBook() {
+        return lastSelectedBook;
     }
 }

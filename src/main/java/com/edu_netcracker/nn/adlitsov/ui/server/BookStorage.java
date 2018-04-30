@@ -29,6 +29,14 @@ public class BookStorage {
         books.add(book);
     }
 
+    public void deleteBook(int id) {
+        for (int i = 0; i < books.size(); i++) {
+            if (books.get(i).getId() == id) {
+                books.remove(i);
+            }
+        }
+    }
+
     public List<Book> getBooks() {
         return new ArrayList<>(books);
     }

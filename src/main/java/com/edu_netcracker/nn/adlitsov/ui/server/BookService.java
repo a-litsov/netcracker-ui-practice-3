@@ -39,4 +39,10 @@ public class BookService {
     public List<Book> sortBooks(@PathParam("query") String query, @PathParam("limit") int limit) {
         return bookStorage.search(query, limit);
     }
+
+    @DELETE
+    public void deleteBook(Integer id) {
+        bookStorage.deleteBook(id);
+    }
+
 }
