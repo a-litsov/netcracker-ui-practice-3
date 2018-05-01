@@ -2,32 +2,28 @@ package com.edu_netcracker.nn.adlitsov.ui.server;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
 import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 public class BookStorage {
+    private BookFileManager fileManager = new BookFileManager();
     private List<Book> books = new ArrayList<>();
-    private int lastId = 0;
+    private int nextId = 0;
 
     {
-        loadBooks();
+        books = fileManager.loadBooks();
+        nextId = getNextId(books);
     }
 
     public void addBook(Book book) {
-        book.setId(lastId++);
+        book.setId(nextId++);
         book.setAddDate(new Date());
 
         books.add(book);
-        saveBooks();
+        fileManager.saveBooks(books);
     }
 
     public void deleteBook(int id) {
@@ -36,7 +32,7 @@ public class BookStorage {
                 books.remove(i);
             }
         }
-        saveBooks();
+        fileManager.saveBooks(books);
     }
 
     public List<Book> getBooks() {
@@ -78,7 +74,7 @@ public class BookStorage {
         return sortBooks;
     }
 
-    public Comparator<Book> appendComparator(Comparator<Book> sourceComp, MyColumnSortInfo sortInfo) {
+    private Comparator<Book> appendComparator(Comparator<Book> sourceComp, MyColumnSortInfo sortInfo) {
         Comparator<Book> newComp = null;
         switch (sortInfo.getColumnName()) {
             case "id":
@@ -147,70 +143,14 @@ public class BookStorage {
         return result;
     }
 
-    public void saveBooks() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        File file = new File(System.getProperty("java.io.tmpdir") + File.separator + "adlitsov-ui-gwt");
-        file.mkdir();
-        file = new File(file.getAbsolutePath() + File.separator + "books.json");
-
-        try {
-            file.createNewFile();
-
-            mapper.writeValue(file, books);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void loadBooks() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        File file = new File(System.getProperty("java.io.tmpdir") + File.separator + "adlitsov-ui-gwt" +
-                                     File.separator + "books.json");
-        if (!file.exists()) {
-            loadDefaultBooks();
-            return;
-        }
-
-        try {
-            books = mapper.readValue(file, new TypeReference<List<Book>>() {
-            });
-            lastId = findMaxId(books) + 1;
-        } catch (IOException e) {
-            books.clear();
-            e.printStackTrace();
-        }
-    }
-
-    public void loadDefaultBooks() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream("books.json");
-
-
-        try {
-            books = mapper.readValue(inputStream, new TypeReference<List<Book>>() {
-            });
-            lastId = findMaxId(books) + 1;
-            inputStream.close();
-        } catch (IOException e) {
-            books.clear();
-            e.printStackTrace();
-        }
-    }
-
-    private int findMaxId(List<Book> books) {
+    private int getNextId(List<Book> books) {
         int maxId = 0;
         for (Book book : books) {
             if (book.getId() > maxId) {
                 maxId = book.getId();
             }
         }
-        return maxId;
+        return maxId + 1;
     }
 }
