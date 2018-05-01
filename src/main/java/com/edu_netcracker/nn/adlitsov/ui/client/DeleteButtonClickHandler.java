@@ -30,13 +30,13 @@ public class DeleteButtonClickHandler implements ClickHandler {
                 @Override
                 public void onFailure(Method method, Throwable throwable) {
                     Label failureLabel = new Label("It's bad delete request! :(");
-                    RootPanel.get("gwtContainer").add(failureLabel);
+                    RootPanel.get().add(failureLabel);
                 }
 
                 @Override
                 public void onSuccess(Method method, Void v) {
                     Label successLabel = new Label("Removed book!");
-                    RootPanel.get("gwtContainer").add(successLabel);
+                    RootPanel.get().add(successLabel);
 
                     main.loadAllBooksToTable();
                     deleteButton.setEnabled(false);

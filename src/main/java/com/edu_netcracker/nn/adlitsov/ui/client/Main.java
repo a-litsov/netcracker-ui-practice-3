@@ -7,6 +7,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -66,32 +67,39 @@ public class Main implements EntryPoint {
     }
 
     private void createAddPanel() {
-        final Label titleLabel = new Label("Title:");
+        final Label titleLabel = new Label("Название:");
         final TextBox titleField = new TextBox();
+        titleField.setVisibleLength(25);
 
-        final Label authorNameLabel = new Label("Author:");
+        final Label authorNameLabel = new Label("Автор:");
         final TextBox authorNameField = new TextBox();
+        authorNameField.setVisibleLength(25);
 
-        final Label pagesLabel = new Label("Pages:");
+        final Label pagesLabel = new Label("Страницы:");
         final IntegerBox pagesField = new IntegerBox();
+//        pagesField.setStyleName("gwt-IntegerBox");
+        pagesField.setMaxLength(4);
+        pagesField.setVisibleLength(4);
 
-        final Label yearLabel = new Label("Year:");
+        final Label yearLabel = new Label("Год:");
         final IntegerBox yearField = new IntegerBox();
+//        yearField.setStyleName("gwt-IntegerBox");
+        yearField.setMaxLength(4);
+        yearField.setVisibleLength(4);
 
-        final Button sendButton = new Button("Submit");
+        final Button sendButton = new Button("Добавить!");
 
-        final HorizontalPanel addBookPanel = new HorizontalPanel();
-        addBookPanel.add(titleLabel);
-        addBookPanel.add(titleField);
-        addBookPanel.add(authorNameLabel);
-        addBookPanel.add(authorNameField);
-        addBookPanel.add(pagesLabel);
-        addBookPanel.add(pagesField);
-        addBookPanel.add(yearLabel);
-        addBookPanel.add(yearField);
-        addBookPanel.add(sendButton);
+        final FlowPanel addBookPanel = new FlowPanel();
+        addBookPanel.add(titledField(titleLabel, titleField));
+        addBookPanel.add(titledField(authorNameLabel, authorNameField));
+        addBookPanel.add(titledField(pagesLabel, pagesField));
+        addBookPanel.add(titledField(yearLabel, yearField));
 
-        RootPanel.get("gwtContainer").add(addBookPanel);
+        addBookPanel.add(vertMidAlignedButton(sendButton));
+
+        addBookPanel.setStyleName("book-add-panel");
+
+        RootPanel.get("book-add-block").add(addBookPanel);
 
         // Create a handler for the sendButton and nameField
         class MyHandler implements ClickHandler {
@@ -124,13 +132,13 @@ public class Main implements EntryPoint {
                     @Override
                     public void onFailure(Method method, Throwable throwable) {
                         Label failureLabel = new Label("It's bad! :(");
-                        RootPanel.get("gwtContainer").add(failureLabel);
+                        RootPanel.get().add(failureLabel);
                     }
 
                     @Override
                     public void onSuccess(Method method, Void v) {
                         Label successLabel = new Label("Added book!");
-                        RootPanel.get("gwtContainer").add(successLabel);
+                        RootPanel.get().add(successLabel);
 
                         loadAllBooksToTable();
                     }
@@ -143,18 +151,35 @@ public class Main implements EntryPoint {
         sendButton.addClickHandler(handler);
     }
 
+    public HorizontalPanel titledField(Label title, Widget field) {
+        HorizontalPanel panel = new HorizontalPanel();
+        panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+        panel.setStyleName("titled-field");
+        panel.add(title);
+        panel.add(field);
+        return panel;
+    }
+
+    public HorizontalPanel vertMidAlignedButton(Button button) {
+        HorizontalPanel panel = new HorizontalPanel();
+        panel.setVerticalAlignment(HasAlignment.ALIGN_MIDDLE);
+        panel.setStyleName("button-panel");
+        panel.add(button);
+        return panel;
+    }
+
     public void loadAllBooksToTable() {
         bookService.getBooks(new MethodCallback<List<Book>>() {
             @Override
             public void onFailure(Method method, Throwable throwable) {
                 Label failureLabel = new Label("It's bad! :(");
-                RootPanel.get("gwtContainer").add(failureLabel);
+                RootPanel.get().add(failureLabel);
             }
 
             @Override
             public void onSuccess(Method method, List<Book> books) {
                 Label successLabel = new Label("Got books!");
-                RootPanel.get("gwtContainer").add(successLabel);
+                RootPanel.get().add(successLabel);
 
                 table.setRowData(books);
             }
@@ -165,6 +190,17 @@ public class Main implements EntryPoint {
     private void createTable() {
         // Create a CellTable.
         table = new CellTable<>();
+        table.setStyleName("book-table");
+
+        // Create id column.
+        TextColumn<Book> idColumn = new TextColumn<Book>() {
+            @Override
+            public String getValue(Book Book) {
+                return Integer.toString(Book.getId());
+            }
+        };
+        idColumn.setDataStoreName("id");
+        idColumn.setSortable(true);
 
         // Create title column.
         TextColumn<Book> titleColumn = new TextColumn<Book>() {
@@ -198,7 +234,7 @@ public class Main implements EntryPoint {
         pagesColumn.setDataStoreName("pages");
         pagesColumn.setSortable(true);
 
-        // Create address column.
+        // Create year column.
         TextColumn<Book> yearColumn = new TextColumn<Book>() {
             @Override
             public String getValue(Book Book) {
@@ -208,11 +244,23 @@ public class Main implements EntryPoint {
         yearColumn.setDataStoreName("year");
         yearColumn.setSortable(true);
 
+        // Create date column.
+        TextColumn<Book> dateColumn = new TextColumn<Book>() {
+            @Override
+            public String getValue(Book Book) {
+                return DateTimeFormat.getFormat("dd-MM-yy").format(Book.getAddDate());
+            }
+        };
+        dateColumn.setDataStoreName("addDate");
+        dateColumn.setSortable(true);
+
         // Add the columns.
-        table.addColumn(titleColumn, "Title");
-        table.addColumn(authorColumn, "Author");
-        table.addColumn(pagesColumn, "Pages count");
-        table.addColumn(yearColumn, "Year");
+        table.addColumn(idColumn, "Id");
+        table.addColumn(titleColumn, "Название");
+        table.addColumn(authorColumn, "Автор");
+        table.addColumn(pagesColumn, "Страницы");
+        table.addColumn(yearColumn, "Год");
+        table.addColumn(dateColumn, "Дата добавления");
 
 //        ListDataProvider<Book> dataProvider = new ListDataProvider<Book>();
         table.setRowCount(ROWS_COUNT);
@@ -230,13 +278,13 @@ public class Main implements EntryPoint {
                     @Override
                     public void onFailure(Method method, Throwable throwable) {
                         Label failureLabel = new Label("Bad sorting request! :(");
-                        RootPanel.get("gwtContainer").add(failureLabel);
+                        RootPanel.get().add(failureLabel);
                     }
 
                     @Override
                     public void onSuccess(Method method, List<Book> books) {
                         Label successLabel = new Label("Sorted books on server!");
-                        RootPanel.get("gwtContainer").add(successLabel);
+                        RootPanel.get().add(successLabel);
 
                         table.setRowData(books);
                     }
@@ -245,7 +293,7 @@ public class Main implements EntryPoint {
         });
 
         // Add it to the root panel.
-        RootPanel.get("gwtContainer").add(table);
+        RootPanel.get("book-table-block").add(table);
     }
 
     private SuggestBox createSuggestBox(Button deleteButton) {
@@ -260,15 +308,19 @@ public class Main implements EntryPoint {
     }
 
     private void createRemovePanel() {
-        Button deleteButton = new Button("Delete");
+        FlowPanel removeBookPanel = new FlowPanel();
+        removeBookPanel.setStyleName("book-remove-panel");
+
+        Button deleteButton = new Button("Удалить");
+        deleteButton.setStyleName("delete-button");
         deleteButton.addClickHandler(new DeleteButtonClickHandler(this, bookService, deleteButton));
         SuggestBox suggestBox = createSuggestBox(deleteButton);
+        suggestBox.setStyleName("suggest-box");
 
-        HorizontalPanel hPanel = new HorizontalPanel();
-        hPanel.add(suggestBox);
-        hPanel.add(deleteButton);
+        removeBookPanel.add(suggestBox);
+        removeBookPanel.add(deleteButton);
 
-        RootPanel.get("gwtContainer").add(hPanel);
+        RootPanel.get("book-remove-block").add(removeBookPanel);
     }
 
     public Book getLastSelectedBook() {

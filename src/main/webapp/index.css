@@ -1,34 +1,73 @@
 /** Add css rules here for your application. */
 
-
-/** Example rules used by the template application (remove for your app) */
-h1 {
-  font-size: 2em;
-  font-weight: bold;
-  color: #777777;
-  margin: 40px 0px 70px;
+body {
+  background: url(https://www.burrellauto.com/templates/10550/images/patterns/subtle_zebra_3d.png) !important;
+  font: 12pt serif;
   text-align: center;
 }
 
-.sendButton {
-  display: block;
-  font-size: 16pt;
+div.page-title {
+  margin: 20px 0;
+  font-size: 175%;
+  text-shadow: 0 1px 0 white;
 }
 
-/** Most GWT widgets already have a style name defined */
-.gwt-DialogBox {
-  width: 400px;
+div.block-title {
+  margin: 5px auto;
+  font-size: 110%;
 }
 
-.dialogVPanel {
-  margin: 5px;
+div.title {
+  font-weight: bold;
+  text-shadow: 0 1px 0 white;
 }
 
-.serverResponseLabelError {
-  color: red;
+div.block {
+  background: url(https://www.burrellauto.com/templates/10550/images/patterns/light_noise_diagonal.png);
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  max-width: 800px;
+
+  border-radius: 5px;
+  box-shadow: 0 3px 20px rgba(0, 0, 0, .2);
+  border-top: 1px solid rgba(255, 255, 255, .7);
 }
 
-/** Set ids using widget.getElement().setId("idOfElement") */
-#closeButton {
-  margin: 15px 6px 6px;
+#book-add-block {
+}
+
+.book-add-panel {
+  /*max-width: 750px;*/
+  margin: 0 auto;
+}
+
+.book-add-panel .gwt-Label {
+  display: inline-block;
+}
+
+.book-add-panel > .titled-field {
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.button-panel {
+  margin: auto 0;
+  display: inline-block;
+}
+
+.book-remove-panel > .suggest-box {
+  width: 80%;
+  resize: both;
+  margin-right: 5px;
+}
+
+.book-remove-panel > .delete-button {
+  min-width: 60px;
+  width: 15%;
+}
+
+.book-table {
+  margin: 0 10px;
 }

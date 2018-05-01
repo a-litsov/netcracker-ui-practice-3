@@ -27,13 +27,13 @@ public class MultiWordsSuggestOracleREST extends MultiWordSuggestOracle {
             @Override
             public void onFailure(Method method, Throwable throwable) {
                 Label failureLabel = new Label("It's bad search! :(");
-                RootPanel.get("gwtContainer").add(failureLabel);
+                RootPanel.get().add(failureLabel);
             }
 
             @Override
             public void onSuccess(Method method, List<Book> books) {
                 Label successLabel = new Label("Got suggestions!");
-                RootPanel.get("gwtContainer").add(successLabel);
+                RootPanel.get().add(successLabel);
 
 
                 Response resp = new Response();
