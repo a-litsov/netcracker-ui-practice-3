@@ -1,6 +1,7 @@
 package com.edu_netcracker.nn.adlitsov.ui.server;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
+import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -26,11 +27,13 @@ public class BookService {
         return bookStorage.getBooks();
     }
 
-    @GET
-    @Path("sort={columnName}&isAsc={asc}")
+
+    @POST
+    @Path("sort")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Book> sortBooks(@PathParam("columnName") String columnName, @PathParam("asc") boolean asc) {
-        return bookStorage.sortByColumn(columnName, asc);
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Book> sortBooks(List<MyColumnSortInfo> columnsSortInfo) {
+        return bookStorage.sort(columnsSortInfo);
     }
 
     @GET

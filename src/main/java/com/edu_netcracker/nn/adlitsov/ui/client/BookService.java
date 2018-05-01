@@ -1,6 +1,7 @@
 package com.edu_netcracker.nn.adlitsov.ui.client;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
+import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
 
@@ -22,11 +23,11 @@ public interface BookService extends RestService {
     @Produces(MediaType.APPLICATION_JSON)
     void getBooks(MethodCallback<List<Book>> callback);
 
-    @GET
-    @Path("api/book/sort={columnName}&isAsc={asc}")
+    @POST
+    @Path("api/book/sort")
     @Produces(MediaType.APPLICATION_JSON)
-    void sortBooks(@PathParam("columnName") String columnName, @PathParam("asc") boolean asc,
-                   MethodCallback<List<Book>> callback);
+    @Consumes(MediaType.APPLICATION_JSON)
+    void sortBooks(List<MyColumnSortInfo> columnsSortInfo, MethodCallback<List<Book>> callback);
 
     @GET
     @Path("api/book/search={query}&limit={limit}")

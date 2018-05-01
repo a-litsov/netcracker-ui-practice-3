@@ -2,6 +2,7 @@ package com.edu_netcracker.nn.adlitsov.ui.client;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
 import com.edu_netcracker.nn.adlitsov.ui.shared.FieldVerifier;
+import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -15,6 +16,7 @@ import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -217,12 +219,14 @@ public class Main implements EntryPoint {
 
         table.addColumnSortHandler((event) -> {
             ColumnSortList sortList = table.getColumnSortList();
+            List<MyColumnSortInfo> mySingleColumnSortList = new ArrayList<>();
             if (sortList != null && sortList.size() > 0) {
                 Column<Book, ?> sortColumn = (Column<Book, ?>) sortList.get(0).getColumn();
                 String name = sortColumn.getDataStoreName();
                 boolean isAsc = event.isSortAscending();
+                mySingleColumnSortList.add(new MyColumnSortInfo(name, isAsc));
 
-                bookService.sortBooks(name, isAsc, new MethodCallback<List<Book>>() {
+                bookService.sortBooks(mySingleColumnSortList, new MethodCallback<List<Book>>() {
                     @Override
                     public void onFailure(Method method, Throwable throwable) {
                         Label failureLabel = new Label("Bad sorting request! :(");

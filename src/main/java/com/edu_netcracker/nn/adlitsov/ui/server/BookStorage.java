@@ -1,6 +1,7 @@
 package com.edu_netcracker.nn.adlitsov.ui.server;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
+import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -72,6 +73,62 @@ public class BookStorage {
 
         List<Book> sortBooks = new ArrayList<>(books);
         sortBooks.sort(comp);
+
+        return sortBooks;
+    }
+
+    public Comparator<Book> appendComparator(Comparator<Book> sourceComp, MyColumnSortInfo sortInfo) {
+        Comparator<Book> newComp = null;
+        switch (sortInfo.getColumnName()) {
+            case "id":
+                newComp = Comparator.comparing(Book::getId);
+                break;
+            case "title":
+                newComp = Comparator.comparing(Book::getTitle);
+                break;
+            case "author":
+                newComp = Comparator.comparing(Book::getAuthorName);
+                break;
+            case "pages":
+                newComp = Comparator.comparing(Book::getPagesCount);
+                break;
+            case "year":
+                newComp = Comparator.comparing(Book::getYear);
+                break;
+            case "addDate":
+                newComp = Comparator.comparing(Book::getAddDate);
+                break;
+            default:
+                throw new IllegalArgumentException("Column-to-field mapping is not recognized! (Column " +
+                                                           sortInfo.getColumnName() + " not found)");
+        }
+        if (!sortInfo.isAscending()) {
+            newComp = newComp.reversed();
+        }
+
+        if (sourceComp != null) {
+            return sourceComp.thenComparing(newComp);
+        } else {
+            return newComp;
+        }
+    }
+
+    public List<Book> sort(List<MyColumnSortInfo> columnsSortInfo) {
+        if (columnsSortInfo == null) {
+            throw new IllegalArgumentException("Invalid sort info!");
+        }
+
+        Comparator<Book> comp = null;
+        for (int i = columnsSortInfo.size() - 1; i >= 0; i--) {
+            MyColumnSortInfo sortInfo = columnsSortInfo.get(i);
+            comp = appendComparator(comp, sortInfo);
+        }
+
+        List<Book> sortBooks = new ArrayList<>(books);
+
+        if (comp != null) {
+            sortBooks.sort(comp);
+        }
 
         return sortBooks;
     }
