@@ -2,7 +2,13 @@ package com.edu_netcracker.nn.adlitsov.ui.server;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
 import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -13,14 +19,7 @@ public class BookStorage {
     private int lastId = 0;
 
     {
-        // add sample books
-        addBook(new Book("Code Complete", "Steve McConnell", 914, 1993));
-        addBook(new Book("The Art of Computer Programming", "Donald Knuth", 3168, 1988));
-        addBook(new Book("Clean Code", "Robert Cecil Martin", 464, 2008));
-        addBook(new Book("Effective Java", "Joshua Bloch", 416, 2018));
-        addBook(new Book("Cracking the Coding Interview: 189 Programming Questions and Solutions",
-                         "Gayle Laakmann McDowell", 508, 2011));
-        addBook(new Book("Algorithms + Data Structures = Programs", "Niklaus Wirth", 366, 1976));
+        loadBooks();
     }
 
     public void addBook(Book book) {
@@ -28,6 +27,7 @@ public class BookStorage {
         book.setAddDate(new Date());
 
         books.add(book);
+        saveBooks();
     }
 
     public void deleteBook(int id) {
@@ -36,6 +36,7 @@ public class BookStorage {
                 books.remove(i);
             }
         }
+        saveBooks();
     }
 
     public List<Book> getBooks() {
@@ -144,5 +145,72 @@ public class BookStorage {
             }
         }
         return result;
+    }
+
+    public void saveBooks() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        File file = new File(System.getProperty("java.io.tmpdir") + File.separator + "adlitsov-ui-gwt");
+        file.mkdir();
+        file = new File(file.getAbsolutePath() + File.separator + "books.json");
+
+        try {
+            file.createNewFile();
+
+            mapper.writeValue(file, books);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadBooks() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        File file = new File(System.getProperty("java.io.tmpdir") + File.separator + "adlitsov-ui-gwt" +
+                                     File.separator + "books.json");
+        if (!file.exists()) {
+            loadDefaultBooks();
+            return;
+        }
+
+        try {
+            books = mapper.readValue(file, new TypeReference<List<Book>>() {
+            });
+            lastId = findMaxId(books) + 1;
+        } catch (IOException e) {
+            books.clear();
+            e.printStackTrace();
+        }
+    }
+
+    public void loadDefaultBooks() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("books.json");
+
+
+        try {
+            books = mapper.readValue(inputStream, new TypeReference<List<Book>>() {
+            });
+            lastId = findMaxId(books) + 1;
+            inputStream.close();
+        } catch (IOException e) {
+            books.clear();
+            e.printStackTrace();
+        }
+    }
+
+    private int findMaxId(List<Book> books) {
+        int maxId = 0;
+        for (Book book : books) {
+            if (book.getId() > maxId) {
+                maxId = book.getId();
+            }
+        }
+        return maxId;
     }
 }
