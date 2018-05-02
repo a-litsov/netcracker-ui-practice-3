@@ -69,5 +69,6 @@ div.block {
 }
 
 .book-table {
-  margin: 0 10px;
+    width: 98%;
+    margin: 0 auto;
 }

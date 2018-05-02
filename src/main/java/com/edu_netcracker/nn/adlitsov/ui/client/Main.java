@@ -1,24 +1,16 @@
 package com.edu_netcracker.nn.adlitsov.ui.client;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
-import com.edu_netcracker.nn.adlitsov.ui.shared.FieldVerifier;
-import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortList;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
+import com.google.gwt.view.client.AsyncDataProvider;
 import org.fusesource.restygwt.client.Defaults;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -45,10 +37,11 @@ public class Main implements EntryPoint {
 
     private final Messages messages = GWT.create(Messages.class);
 
-    private static final int ROWS_COUNT = 10;
+    private static final int VISIBLE_ROWS_COUNT = 3;
     private static final int SUGGEST_LIMIT = 10;
 
     private CellTable<Book> table;
+
     private Book lastSelectedBook;
 
     /**
@@ -59,10 +52,9 @@ public class Main implements EntryPoint {
         root = root.replace("gwt/", "");
         Defaults.setServiceRoot(root);
 
+        table = createTable();
 
         createAddPanel();
-        createTable();
-        loadAllBooksToTable();
         createRemovePanel();
     }
 
@@ -77,13 +69,11 @@ public class Main implements EntryPoint {
 
         final Label pagesLabel = new Label("Страницы:");
         final IntegerBox pagesField = new IntegerBox();
-//        pagesField.setStyleName("gwt-IntegerBox");
         pagesField.setMaxLength(4);
         pagesField.setVisibleLength(4);
 
         final Label yearLabel = new Label("Год:");
         final IntegerBox yearField = new IntegerBox();
-//        yearField.setStyleName("gwt-IntegerBox");
         yearField.setMaxLength(4);
         yearField.setVisibleLength(4);
 
@@ -94,60 +84,14 @@ public class Main implements EntryPoint {
         addBookPanel.add(titledField(authorNameLabel, authorNameField));
         addBookPanel.add(titledField(pagesLabel, pagesField));
         addBookPanel.add(titledField(yearLabel, yearField));
-
         addBookPanel.add(vertMidAlignedButton(sendButton));
-
         addBookPanel.setStyleName("book-add-panel");
 
         RootPanel.get("book-add-block").add(addBookPanel);
 
-        // Create a handler for the sendButton and nameField
-        class MyHandler implements ClickHandler {
-            /**
-             * Fired when the user clicks on the sendButton.
-             */
-            public void onClick(ClickEvent event) {
-                sendBookToServer();
-            }
-
-            /**
-             * Send the name from the nameField to the server and wait for a response.
-             */
-            private void sendBookToServer() {
-                // First, we validate the input.
-                String bookTitle = titleField.getText();
-                String authorName = authorNameField.getText();
-                int year = yearField.getValue();
-                int pages = pagesField.getValue();
-                if (!FieldVerifier.isValidName(bookTitle)) {
-                    return;
-                }
-                System.out.println(year);
-
-                Book book = new Book(bookTitle, authorName, pages, year);
-
-                // Then, we send the input to the server.
-//        sendButton.setEnabled(false);
-                bookService.addBook(book, new MethodCallback<Void>() {
-                    @Override
-                    public void onFailure(Method method, Throwable throwable) {
-                        Label failureLabel = new Label("It's bad! :(");
-                        RootPanel.get().add(failureLabel);
-                    }
-
-                    @Override
-                    public void onSuccess(Method method, Void v) {
-                        Label successLabel = new Label("Added book!");
-                        RootPanel.get().add(successLabel);
-
-                        loadAllBooksToTable();
-                    }
-                });
-            }
-        }
-
         // Add a handler to send the name to the server
-        MyHandler handler = new MyHandler();
+        ClickHandler handler = new AddButtonClickHandler(table, bookService, titleField, authorNameField,
+                                                         yearField, pagesField);
         sendButton.addClickHandler(handler);
     }
 
@@ -168,28 +112,9 @@ public class Main implements EntryPoint {
         return panel;
     }
 
-    public void loadAllBooksToTable() {
-        bookService.getBooks(new MethodCallback<List<Book>>() {
-            @Override
-            public void onFailure(Method method, Throwable throwable) {
-                Label failureLabel = new Label("It's bad! :(");
-                RootPanel.get().add(failureLabel);
-            }
-
-            @Override
-            public void onSuccess(Method method, List<Book> books) {
-                Label successLabel = new Label("Got books!");
-                RootPanel.get().add(successLabel);
-
-                table.setRowData(books);
-            }
-        });
-
-    }
-
-    private void createTable() {
+    private CellTable<Book> createTable() {
         // Create a CellTable.
-        table = new CellTable<>();
+        CellTable<Book> table = new CellTable<>();
         table.setStyleName("book-table");
 
         // Create id column.
@@ -262,38 +187,24 @@ public class Main implements EntryPoint {
         table.addColumn(yearColumn, "Год");
         table.addColumn(dateColumn, "Дата добавления");
 
-//        ListDataProvider<Book> dataProvider = new ListDataProvider<Book>();
-        table.setRowCount(ROWS_COUNT);
 
         table.addColumnSortHandler((event) -> {
-            ColumnSortList sortList = table.getColumnSortList();
-            List<MyColumnSortInfo> mySingleColumnSortList = new ArrayList<>();
-            if (sortList != null && sortList.size() > 0) {
-                Column<Book, ?> sortColumn = (Column<Book, ?>) sortList.get(0).getColumn();
-                String name = sortColumn.getDataStoreName();
-                boolean isAsc = event.isSortAscending();
-                mySingleColumnSortList.add(new MyColumnSortInfo(name, isAsc));
-
-                bookService.sortBooks(mySingleColumnSortList, new MethodCallback<List<Book>>() {
-                    @Override
-                    public void onFailure(Method method, Throwable throwable) {
-                        Label failureLabel = new Label("Bad sorting request! :(");
-                        RootPanel.get().add(failureLabel);
-                    }
-
-                    @Override
-                    public void onSuccess(Method method, List<Book> books) {
-                        Label successLabel = new Label("Sorted books on server!");
-                        RootPanel.get().add(successLabel);
-
-                        table.setRowData(books);
-                    }
-                });
-            }
+            table.setVisibleRangeAndClearData(table.getVisibleRange(), true);
         });
 
-        // Add it to the root panel.
+        table.setPageSize(VISIBLE_ROWS_COUNT);
+        AsyncDataProvider<Book> provider = new BookAsyncDataProvider(table, bookService);
+        provider.addDataDisplay(table);
+
+        SimplePager pager = new FixedRangesSimplePager();
+        pager.setDisplay(table);
+
+
+        // Add them to the panel
         RootPanel.get("book-table-block").add(table);
+        RootPanel.get("book-table-block").add(pager);
+
+        return table;
     }
 
     private SuggestBox createSuggestBox(Button deleteButton) {
@@ -312,7 +223,7 @@ public class Main implements EntryPoint {
         removeBookPanel.setStyleName("book-remove-panel");
 
         Button deleteButton = new Button("Удалить");
-        deleteButton.setStyleName("delete-button");
+        deleteButton.setStyleName("delete-button", true);
         deleteButton.addClickHandler(new DeleteButtonClickHandler(this, bookService, deleteButton));
         SuggestBox suggestBox = createSuggestBox(deleteButton);
         suggestBox.setStyleName("suggest-box");
@@ -325,5 +236,9 @@ public class Main implements EntryPoint {
 
     public Book getLastSelectedBook() {
         return lastSelectedBook;
+    }
+
+    public CellTable<Book> getTable() {
+        return table;
     }
 }

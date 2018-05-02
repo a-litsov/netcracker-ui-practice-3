@@ -11,14 +11,15 @@ import java.util.List;
 public class BookStorage {
     private BookFileManager fileManager = new BookFileManager();
     private List<Book> books = new ArrayList<>();
-    private int nextId = 0;
+    private int nextId = 1;
 
     {
         books = fileManager.loadBooks();
         nextId = getNextId(books);
     }
 
-    public void addBook(Book book) {
+
+    public synchronized void addBook(Book book) {
         book.setId(nextId++);
         book.setAddDate(new Date());
 
@@ -26,7 +27,7 @@ public class BookStorage {
         fileManager.saveBooks(books);
     }
 
-    public void deleteBook(int id) {
+    public synchronized void deleteBook(int id) {
         for (int i = 0; i < books.size(); i++) {
             if (books.get(i).getId() == id) {
                 books.remove(i);
@@ -39,39 +40,17 @@ public class BookStorage {
         return new ArrayList<>(books);
     }
 
-    public List<Book> sortByColumn(String columnName, boolean isAsc) {
-        Comparator<Book> comp = null;
-        switch (columnName) {
-            case "id":
-                comp = Comparator.comparing(Book::getId);
-                break;
-            case "title":
-                comp = Comparator.comparing(Book::getTitle);
-                break;
-            case "author":
-                comp = Comparator.comparing(Book::getAuthorName);
-                break;
-            case "pages":
-                comp = Comparator.comparing(Book::getPagesCount);
-                break;
-            case "year":
-                comp = Comparator.comparing(Book::getYear);
-                break;
-            case "addDate":
-                comp = Comparator.comparing(Book::getAddDate);
-                break;
-            default:
-                throw new IllegalArgumentException("Column-to-field mapping is not recognized! (Column " +
-                                                           columnName + " not found)");
-        }
-        if (!isAsc) {
-            comp = comp.reversed();
-        }
+    public List<Book> getBooks(int start, int length) {
+        return books.subList(start, start + length);
+    }
 
-        List<Book> sortBooks = new ArrayList<>(books);
-        sortBooks.sort(comp);
+    public List<Book> getSortedBooks(int start, int length, List<MyColumnSortInfo> columnsSortInfo) {
+        List<Book> sortedBooks = sort(columnsSortInfo);
+        return sortedBooks.subList(start, start + length);
+    }
 
-        return sortBooks;
+    public int getBooksCount() {
+        return books.size();
     }
 
     private Comparator<Book> appendComparator(Comparator<Book> sourceComp, MyColumnSortInfo sortInfo) {

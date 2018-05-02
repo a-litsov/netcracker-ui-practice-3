@@ -1,9 +1,8 @@
 package com.edu_netcracker.nn.adlitsov.ui.client;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -26,15 +25,12 @@ public class MultiWordsSuggestOracleREST extends MultiWordSuggestOracle {
         bookService.search(query, suggestLimit, new MethodCallback<List<Book>>() {
             @Override
             public void onFailure(Method method, Throwable throwable) {
-                Label failureLabel = new Label("It's bad search! :(");
-                RootPanel.get().add(failureLabel);
+                GWT.log("It's bad search! :(");
             }
 
             @Override
             public void onSuccess(Method method, List<Book> books) {
-                Label successLabel = new Label("Got suggestions!");
-                RootPanel.get().add(successLabel);
-
+                GWT.log("Got suggestions!");
 
                 Response resp = new Response();
                 List<SuggestOracle.Suggestion> suggestions = new ArrayList<>();

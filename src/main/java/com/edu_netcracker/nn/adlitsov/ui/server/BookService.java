@@ -1,10 +1,13 @@
 package com.edu_netcracker.nn.adlitsov.ui.server;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
+import com.edu_netcracker.nn.adlitsov.ui.shared.BooksQuery;
 import com.edu_netcracker.nn.adlitsov.ui.shared.MyColumnSortInfo;
+import com.edu_netcracker.nn.adlitsov.ui.shared.Pair;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,15 +30,6 @@ public class BookService {
         return bookStorage.getBooks();
     }
 
-
-    @POST
-    @Path("sort")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public List<Book> sortBooks(List<MyColumnSortInfo> columnsSortInfo) {
-        return bookStorage.sort(columnsSortInfo);
-    }
-
     @GET
     @Path("search={query}&limit={limit}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -48,4 +42,20 @@ public class BookService {
         bookStorage.deleteBook(id);
     }
 
+    @POST
+    @Path("sortedRange")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Pair<Integer, List<Book>> sortedRange(BooksQuery query) {
+        int booksCount = bookStorage.getBooksCount();
+        int start = query.getStart();
+        int length = query.getLength() <= booksCount - start ? query.getLength() : booksCount - start;
+        List<Book> subBooks;
+        if (query.getSortInfo() != null)
+            subBooks = bookStorage.getSortedBooks(start, length, new ArrayList<MyColumnSortInfo>() {{
+                add(query.getSortInfo());
+            }});
+        else
+            subBooks = bookStorage.getBooks(start, length);
+        return new Pair<>(booksCount, subBooks);
+    }
 }

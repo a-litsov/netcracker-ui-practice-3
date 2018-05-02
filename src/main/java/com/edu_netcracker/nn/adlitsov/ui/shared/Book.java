@@ -95,6 +95,6 @@ public class Book {
 
     @Override
     public String toString() {
-        return title + ", " + authorName + " , " + year + " year, " + pagesCount + " pages";
+        return title + ", " + authorName + " , " + year + " год, " + pagesCount + " страниц";
     }
 }
