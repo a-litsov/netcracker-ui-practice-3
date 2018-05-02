@@ -46,5 +46,101 @@
     "pagesCount": 366,
     "year": 1976,
     "addDate": 1525149700515
+  },
+  {
+    "id": 7,
+    "title": "Библия Delphi",
+    "authorName": "Михаил Фленов",
+    "pagesCount": 686,
+    "year": 2005,
+    "addDate": 1525248202672
+  },
+  {
+    "id": 8,
+    "title": "Linux глазами хакера",
+    "authorName": "Михаил Фленов",
+    "pagesCount": 432,
+    "year": 2006,
+    "addDate": 1525248259181
+  },
+  {
+    "id": 9,
+    "title": "Библия C#",
+    "authorName": "Михаил Фленов",
+    "pagesCount": 560,
+    "year": 2011,
+    "addDate": 1525248295028
+  },
+  {
+    "id": 10,
+    "title": "Трое в лодке, не считая собаки",
+    "authorName": "Джером К. Джером",
+    "pagesCount": 384,
+    "year": 2017,
+    "addDate": 1525248412134
+  },
+  {
+    "id": 11,
+    "title": "Преступление и наказание",
+    "authorName": "Федор Достоевский",
+    "pagesCount": 592,
+    "year": 2006,
+    "addDate": 1525248460359
+  },
+  {
+    "id": 12,
+    "title": "Горе от ума",
+    "authorName": "Александр Грибоедов",
+    "pagesCount": 160,
+    "year": 2015,
+    "addDate": 1525248503410
+  },
+  {
+    "id": 13,
+    "title": "Война и мир",
+    "authorName": "Лев Толстой",
+    "pagesCount": 1408,
+    "year": 2014,
+    "addDate": 1525248558427
+  },
+  {
+    "id": 14,
+    "title": "Тихий Дон",
+    "authorName": "Михаил Шолохов",
+    "pagesCount": 1206,
+    "year": 1980,
+    "addDate": 1525248606394
+  },
+  {
+    "id": 15,
+    "title": "Детство. Отрочество. Юность",
+    "authorName": "Лев Толстой",
+    "pagesCount": 432,
+    "year": 2009,
+    "addDate": 1525248731630
+  },
+  {
+    "id": 16,
+    "title": "Мастер и Маргарита",
+    "authorName": "Михаил Булгаков",
+    "pagesCount": 480,
+    "year": 2016,
+    "addDate": 1525248776027
+  },
+  {
+    "id": 17,
+    "title": "Отцы и дети",
+    "authorName": "Иван Тургенев",
+    "pagesCount": 480,
+    "year": 2018,
+    "addDate": 1525248855177
+  },
+  {
+    "id": 18,
+    "title": "Мертвые души",
+    "authorName": "Николай Гоголь",
+    "pagesCount": 610,
+    "year": 2009,
+    "addDate": 1525248931184
   }
 ]

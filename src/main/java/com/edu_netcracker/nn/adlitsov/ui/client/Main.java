@@ -35,10 +35,8 @@ public class Main implements EntryPoint {
      */
     private final BookService bookService = GWT.create(BookService.class);
 
-    private final Messages messages = GWT.create(Messages.class);
-
-    private static final int VISIBLE_ROWS_COUNT = 3;
-    private static final int SUGGEST_LIMIT = 10;
+    private static final int VISIBLE_ROWS_COUNT = 10;
+    private static final int SUGGEST_LIMIT = 5;
 
     private CellTable<Book> table;
 
@@ -89,7 +87,7 @@ public class Main implements EntryPoint {
 
         RootPanel.get("book-add-block").add(addBookPanel);
 
-        // Add a handler to send the name to the server
+        // Add a handler to send the book to the server
         ClickHandler handler = new AddButtonClickHandler(table, bookService, titleField, authorNameField,
                                                          yearField, pagesField);
         sendButton.addClickHandler(handler);
