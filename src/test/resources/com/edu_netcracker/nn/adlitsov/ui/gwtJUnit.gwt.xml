@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<module rename-to="gwt">
-  <!-- Inherit our applications main module.                      -->
-  <inherits name='com.edu_netcracker.nn.adlitsov.ui.gwt' />
-
-  <!-- Specify the path to any remote services.                   -->
-  <servlet path="/gwt/greet" class="com.edu_netcracker.nn.adlitsov.ui.server.GreetingServiceImpl" />
-
-</module>
