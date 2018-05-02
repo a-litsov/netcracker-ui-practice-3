@@ -223,6 +223,7 @@ public class Main implements EntryPoint {
         removeBookPanel.setStyleName("book-remove-panel");
 
         Button deleteButton = new Button("Удалить");
+        deleteButton.setEnabled(false);
         deleteButton.setStyleName("delete-button", true);
         deleteButton.addClickHandler(new DeleteButtonClickHandler(this, bookService, deleteButton));
         SuggestBox suggestBox = createSuggestBox(deleteButton);
