@@ -5,32 +5,33 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.view.client.SetSelectionModel;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class DeleteButtonClickHandler implements ClickHandler {
-    private Main main;
+public class DeleteSelectedButtonClickHandler implements ClickHandler {
     private BookService bookService;
-    private Button deleteButton;
+    private CellTable<Book> table;
+    private SetSelectionModel<Book> selectionModel;
 
+    public DeleteSelectedButtonClickHandler() {
 
-    public DeleteButtonClickHandler(Main main, BookService bookService, Button deleteButton) {
-        this.main = main;
-        this.bookService = bookService;
-        this.deleteButton = deleteButton;
     }
 
+    public DeleteSelectedButtonClickHandler(BookService bookService, CellTable<Book> table) {
+        this.bookService = bookService;
+        this.table = table;
+        this.selectionModel = (SetSelectionModel<Book>) table.getSelectionModel();
+    }
 
     @Override
     public void onClick(ClickEvent clickEvent) {
-        Book lastSelectedBook = main.getLastSelectedBook();
-        if (lastSelectedBook != null) {
-            bookService.deleteBooks(new ArrayList<Integer>() {{
-                add(lastSelectedBook.getId());
-            }}, new MethodCallback<Void>() {
+        List<Integer> idList = getSelectedIdList();
+        if (!idList.isEmpty()) {
+            bookService.deleteBooks(idList, new MethodCallback<Void>() {
                 @Override
                 public void onFailure(Method method, Throwable throwable) {
                     GWT.log("It's bad delete request! :(");
@@ -38,14 +39,17 @@ public class DeleteButtonClickHandler implements ClickHandler {
 
                 @Override
                 public void onSuccess(Method method, Void v) {
-                    GWT.log("Removed book!");
+                    GWT.log("Removed book(s)!");
 
-                    CellTable<Book> table = main.getTable();
                     table.setRowCount(table.getRowCount() - 1);
                     table.setVisibleRangeAndClearData(table.getVisibleRange(), true);
-                    deleteButton.setEnabled(false);
+                    selectionModel.clear();
                 }
             });
         }
+    }
+
+    private List<Integer> getSelectedIdList() {
+        return selectionModel.getSelectedSet().stream().map(Book::getId).collect(Collectors.toList());
     }
 }

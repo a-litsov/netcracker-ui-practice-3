@@ -1,15 +1,20 @@
 package com.edu_netcracker.nn.adlitsov.ui.client;
 
 import com.edu_netcracker.nn.adlitsov.ui.shared.Book;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.AsyncDataProvider;
+import com.google.gwt.view.client.DefaultSelectionEventManager;
+import com.google.gwt.view.client.MultiSelectionModel;
+import com.google.gwt.view.client.SelectionModel;
 import org.fusesource.restygwt.client.Defaults;
 
 /**
@@ -39,7 +44,7 @@ public class Main implements EntryPoint {
     private static final int SUGGEST_LIMIT = 5;
 
     private CellTable<Book> table;
-
+    private AsyncDataProvider<Book> provider;
     private Book lastSelectedBook;
 
     /**
@@ -115,6 +120,26 @@ public class Main implements EntryPoint {
         CellTable<Book> table = new CellTable<>();
         table.setStyleName("book-table");
 
+        table.setPageSize(VISIBLE_ROWS_COUNT);
+        provider = new BookAsyncDataProvider(table, bookService);
+        provider.addDataDisplay(table);
+
+        final SelectionModel<Book> selectionModel = new MultiSelectionModel<>(provider);
+
+        table.setSelectionModel(selectionModel,
+                                DefaultSelectionEventManager.<Book>createCheckboxManager());
+
+        // Create checkbox column.
+        Column<Book, Boolean> checkColumn = new Column<Book, Boolean>(new CheckboxCell(false, false)) {
+            @Override
+            public Boolean getValue(Book book) {
+                if (book != null) {
+                    return selectionModel.isSelected(book);
+                }
+                return null;
+            }
+        };
+
         // Create id column.
         TextColumn<Book> idColumn = new TextColumn<Book>() {
             @Override
@@ -178,6 +203,7 @@ public class Main implements EntryPoint {
         dateColumn.setSortable(true);
 
         // Add the columns.
+        table.addColumn(checkColumn);
         table.addColumn(idColumn, "Id");
         table.addColumn(titleColumn, "Название");
         table.addColumn(authorColumn, "Автор");
@@ -185,14 +211,11 @@ public class Main implements EntryPoint {
         table.addColumn(yearColumn, "Год");
         table.addColumn(dateColumn, "Дата добавления");
 
-
         table.addColumnSortHandler((event) -> {
             table.setVisibleRangeAndClearData(table.getVisibleRange(), true);
         });
 
-        table.setPageSize(VISIBLE_ROWS_COUNT);
-        AsyncDataProvider<Book> provider = new BookAsyncDataProvider(table, bookService);
-        provider.addDataDisplay(table);
+
 
         SimplePager pager = new FixedRangesSimplePager();
         pager.setDisplay(table);
@@ -224,11 +247,16 @@ public class Main implements EntryPoint {
         deleteButton.setEnabled(false);
         deleteButton.setStyleName("delete-button", true);
         deleteButton.addClickHandler(new DeleteButtonClickHandler(this, bookService, deleteButton));
+        Button deleteSelectedButton = new Button("Удалить строки");
+        deleteSelectedButton.setStyleName("delete-rows-button", true);
+        deleteSelectedButton.addClickHandler(new DeleteSelectedButtonClickHandler(bookService, table));
         SuggestBox suggestBox = createSuggestBox(deleteButton);
+        suggestBox.setText("Начните вводить название книги...");
         suggestBox.setStyleName("suggest-box");
 
         removeBookPanel.add(suggestBox);
         removeBookPanel.add(deleteButton);
+        removeBookPanel.add(deleteSelectedButton);
 
         RootPanel.get("book-remove-block").add(removeBookPanel);
     }

@@ -38,8 +38,8 @@ public class BookService {
     }
 
     @DELETE
-    public void deleteBook(Integer id) {
-        bookStorage.deleteBook(id);
+    public void deleteBooks(List<Integer> idList) {
+        bookStorage.deleteBooks(idList);
     }
 
     @POST

@@ -27,10 +27,10 @@ public class BookStorage {
         fileManager.saveBooks(books);
     }
 
-    public synchronized void deleteBook(int id) {
+    public synchronized void deleteBooks(List<Integer> idList) {
         for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getId() == id) {
-                books.remove(i);
+            if (idList.contains(books.get(i).getId())) {
+                books.remove(i--);
             }
         }
         fileManager.saveBooks(books);

@@ -31,7 +31,7 @@ public interface BookService extends RestService {
 
     @DELETE
     @Path("api/book/")
-    void deleteBook(Integer id, MethodCallback<Void> callback);
+    void deleteBooks(List<Integer> idList, MethodCallback<Void> callback);
 
     @POST
     @Path("api/book/sortedRange")

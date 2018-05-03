@@ -58,13 +58,19 @@ div.block {
 }
 
 .book-remove-panel > .suggest-box {
-  width: 80%;
+  width: 70%;
   resize: both;
   margin-right: 5px;
 }
 
 .book-remove-panel > .delete-button {
   min-width: 60px;
+  width: 10%;
+  margin-right: 5px;
+}
+
+.book-remove-panel > .delete-rows-button {
+  min-width: 105px;
   width: 15%;
 }
 
