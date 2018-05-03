@@ -78,3 +78,21 @@ div.block {
     width: 98%;
     margin: 0 auto;
 }
+
+.gwt-TextBox-invalidEntry {
+  border-color: red;
+}
+
+.gwt-IntegerBox-invalidEntry {
+  border-color: red;
+}
+
+.book-add-warning-label {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+}
+
+.gwt-IntegerBox {
+
+}

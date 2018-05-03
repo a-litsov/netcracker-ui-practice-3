@@ -9,14 +9,14 @@ public class Validators {
     }
 
     public static boolean author(String author) {
-        return author.toLowerCase().matches("^(?:[a-zа-я]+(?: |\\\\. ?)?)+[a-zа-я]$");
+        return author.toLowerCase().matches("^(?:[a-zа-я]+(?: |\\. ?)?)+[a-zа-я]$");
     }
 
     public static boolean pages(String pages) {
-        return pages.matches("^[1-9]\\d+");
+        return pages.matches("^[1-9]\\d*$");
     }
 
     public static boolean year(String year) {
-        return year.matches("^[1-9]\\d+") && Integer.parseInt(year) <= CURRENT_YEAR;
+        return year.matches("^[12]\\d{3}$") && Integer.parseInt(year) <= CURRENT_YEAR;
     }
 }

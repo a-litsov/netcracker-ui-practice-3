@@ -74,11 +74,13 @@ public class Main implements EntryPoint {
         final IntegerBox pagesField = new IntegerBox();
         pagesField.setMaxLength(4);
         pagesField.setVisibleLength(4);
+        pagesField.addStyleName("gwt-IntegerBox");
 
         final Label yearLabel = new Label("Год:");
         final IntegerBox yearField = new IntegerBox();
         yearField.setMaxLength(4);
         yearField.setVisibleLength(4);
+        yearField.addStyleName("gwt-IntegerBox");
 
         final Button sendButton = new Button("Добавить!");
 
